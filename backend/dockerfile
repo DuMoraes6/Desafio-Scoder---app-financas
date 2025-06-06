@@ -1,0 +1,21 @@
+# Imagem base
+FROM node:18-alpine
+
+# Diretório de trabalho dentro do container
+WORKDIR /app
+
+# Copiar arquivos de configuração e dependências primeiro (para cache)
+COPY package.json package-lock.json tsconfig.json ./
+
+# Instalar dependências
+RUN npm install
+
+# Copiar o restante do código-fonte
+COPY ./src ./src
+COPY .env .env
+
+# Expor a porta do backend
+EXPOSE 3333
+
+# Comando para rodar o backend
+CMD ["npm", "run", "dev"]
