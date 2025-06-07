@@ -1,0 +1,28 @@
+# Etapa de build
+FROM node:18-alpine as build
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+# Etapa de produção
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Instalar serve
+RUN npm install -g serve
+
+# Copiar a pasta dist gerada na etapa de build
+COPY --from=build /app/dist ./dist
+
+# Expor porta 5000 (servidor serve)
+EXPOSE 5000
+
+# Comando para rodar o servidor
+CMD ["serve", "-s", "dist", "-l", "5000"]

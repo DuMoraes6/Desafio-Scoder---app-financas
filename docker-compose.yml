@@ -32,5 +32,15 @@ services:
       - ./backend/tsconfig.json:/app/tsconfig.json
       - ./backend/.env:/app/.env
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend-finapp
+    restart: always
+    ports:
+      - '5000:5000'
+    depends_on:
+      - backend
+
 volumes:
   pgdata:

@@ -4,10 +4,11 @@ Projeto de desafio técnico para estágio - App de controle financeiro.
 
 ## 🚀 Tecnologias utilizadas
 
-- **Frontend**: React + TypeScript + Vite
-- **Backend**: Node.js + TypeScript + Express + TypeORM
-- **Banco de dados**: PostgreSQL (rodando em Docker)
+- **Frontend**: React + TypeScript + Vite (build + serve rodando em container)
+- **Backend**: Node.js + TypeScript + Express + TypeORM (rodando em container)
+- **Banco de dados**: PostgreSQL (rodando em container)
 - **Gerenciamento de dependências**: npm
+- **Orquestração de containers**: Docker Compose
 - **API testada com**: Postman
 
 ## ⚙️ Funcionalidades
@@ -19,7 +20,7 @@ Projeto de desafio técnico para estágio - App de controle financeiro.
 ✅ Botão de deletar transações com senha protegida  
 ✅ Backend seguro com variável de ambiente para senha  
 ✅ CRUD completo de transações  
-✅ Integração Frontend + Backend + Banco via Docker Compose
+✅ Integração Frontend + Backend + Banco via Docker Compose (tudo em container)
 
 ## 🗂️ Estrutura do projeto
 
@@ -31,10 +32,12 @@ fin-app/
 │   ├── tsconfig.json
 │   ├── .env
 │   ├── Dockerfile
-├── frontend/           # Aplicação React
+├── frontend/           # Aplicação React (build + serve em container)
 │   ├── src/
 │   ├── package.json
 │   ├── tsconfig.json
+│   ├── vite.config.ts
+│   ├── Dockerfile
 ├── docker-compose.yml
 ├── .gitignore
 ├── README.md
@@ -44,35 +47,39 @@ fin-app/
 
 ### Pré-requisitos
 
-- Node.js
 - Docker e Docker Compose
 - Git
 
 ### Passo a passo
 
-#### Backend + Banco de Dados
+#### Clonar o repositório
+
+```bash
+git clone https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
+cd fin-app
+```
+
+#### Rodar tudo em container
 
 ```bash
 docker-compose up --build
 ```
 
-👉 Após a primeira vez, você pode rodar apenas:
+👉 O comando acima sobe:
 
-```bash
-docker-compose up
-```
+✅ Banco de dados (PostgreSQL)  
+✅ Backend (Node.js + Express)  
+✅ Frontend (React + Vite build + serve)  
 
-#### Frontend
+#### Acessar o app
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+- Frontend: [http://localhost:5000](http://localhost:5000)
+- Backend (API): [http://localhost:3333](http://localhost:3333)
 
-### Banco de dados (Docker)
+### 🚩 Observação
 
-O serviço `db` (PostgreSQL) já é iniciado automaticamente via `docker-compose`.
+- O frontend roda no container em modo **build + serve** → ideal para evitar problemas de hot reload em container no Windows.
+- O backend e banco rodam em container normalmente.
 
 ## ✨ Sobre a segurança
 

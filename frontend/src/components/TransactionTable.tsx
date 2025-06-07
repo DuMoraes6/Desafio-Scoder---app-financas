@@ -23,6 +23,7 @@ export function TransactionTable({ transactions, onDelete }: Props) {
     setFilterType('');
   };
 
+  // Filtrar e ordenar transações
   const filteredTransactions = transactions
     .filter((tx) => {
       const matchesDate = filterMonth ? tx.date.startsWith(filterMonth) : true;
@@ -39,17 +40,31 @@ export function TransactionTable({ transactions, onDelete }: Props) {
       return 0;
     });
 
-  const totalsByCurrency = filteredTransactions.reduce((acc, tx) => {
-    if (!acc[tx.currency]) {
-      acc[tx.currency] = { credit: 0, debit: 0 };
+  // Agrupar transações por mês
+  const transactionsByMonth: Record<string, Transaction[]> = {};
+
+  filteredTransactions.forEach((tx) => {
+    const month = tx.date.slice(0, 7); // YYYY-MM
+    if (!transactionsByMonth[month]) {
+      transactionsByMonth[month] = [];
     }
-    if (tx.type === 'credit') {
-      acc[tx.currency].credit += Number(tx.amount);
-    } else {
-      acc[tx.currency].debit += Number(tx.amount);
-    }
-    return acc;
-  }, {} as Record<string, { credit: number; debit: number }>);
+    transactionsByMonth[month].push(tx);
+  });
+
+  // Calcular total por moeda para um grupo de transações
+  const calculateTotals = (txs: Transaction[]) => {
+    return txs.reduce((acc, tx) => {
+      if (!acc[tx.currency]) {
+        acc[tx.currency] = { credit: 0, debit: 0 };
+      }
+      if (tx.type === 'credit') {
+        acc[tx.currency].credit += Number(tx.amount);
+      } else {
+        acc[tx.currency].debit += Number(tx.amount);
+      }
+      return acc;
+    }, {} as Record<string, { credit: number; debit: number }>);
+  };
 
   return (
     <div>
@@ -91,73 +106,93 @@ export function TransactionTable({ transactions, onDelete }: Props) {
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
               >
-                <option value="">All</option>
-                <option value="credit">Crédit</option>
-                <option value="debit">Débit</option>
+                <option value="">Todos</option>
+                <option value="credit">Crédito</option>
+                <option value="debit">Débito</option>
               </select>
             </th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {filteredTransactions.map((tx) => (
-            <tr key={tx.id}>
-              <td>{formatDate(tx.date)}</td>
-              <td>{tx.description}</td>
-              <td className={tx.type === 'credit' ? 'positive' : 'negative'}>
-                {new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: tx.currency,
-                }).format(tx.amount)}
-              </td>
-              <td>
-                {tx.type === 'credit' ? (
-                  <span style={{ color: 'green' }}>
-                    <FaArrowDown /> Credit
-                  </span>
-                ) : (
-                  <span style={{ color: 'red' }}>
-                    <FaArrowUp /> Debit
-                  </span>
-                )}
-              </td>
-              <td>
-                <button onClick={() => onDelete(tx.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
+          {Object.keys(transactionsByMonth)
+            .sort((a, b) => (a > b ? -1 : 1)) // Mês mais recente primeiro
+            .map((month) => {
+              const txs = transactionsByMonth[month];
+              const totals = calculateTotals(txs);
 
-          {Object.entries(totalsByCurrency).map(([currency, totals]) => (
-            <tr key={currency}>
-              <td colSpan={2}>
-                <strong>Total ({currency})</strong>
-              </td>
-              <td colSpan={3}>
-                <strong>
-                  <span style={{ color: 'green' }}>
-                    Credit:{' '}
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency,
-                    }).format(totals.credit)}
-                  </span>{' '}
-                  |{' '}
-                  <span style={{ color: 'red' }}>
-                    Debit:{' '}
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency,
-                    }).format(totals.debit)}
-                  </span>
-                </strong>
-              </td>
-            </tr>
-          ))}
+              return (
+                <>
+                  {/* Header do mês */}
+                  <tr key={`header-${month}`}>
+                    <td colSpan={5} style={{ backgroundColor: '#f0f0f0', fontWeight: 'bold' }}>
+                      {month.split('-')[1]}/{month.split('-')[0]}
+                    </td>
+                  </tr>
+
+                  {/* Transações do mês */}
+                  {txs.map((tx) => (
+                    <tr key={tx.id}>
+                      <td>{formatDate(tx.date)}</td>
+                      <td>{tx.description}</td>
+                      <td className={tx.type === 'credit' ? 'positive' : 'negative'}>
+                        {new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: tx.currency,
+                        }).format(tx.amount)}
+                      </td>
+                      <td>
+                        {tx.type === 'credit' ? (
+                          <span style={{ color: 'green' }}>
+                            <FaArrowDown /> Credit
+                          </span>
+                        ) : (
+                          <span style={{ color: 'red' }}>
+                            <FaArrowUp /> Debit
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        <button onClick={() => onDelete(tx.id)}>Deletar</button>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {/* Totais do mês */}
+                  {Object.entries(totals).map(([currency, total]) => (
+                    <tr key={`total-${month}-${currency}`}>
+                      <td colSpan={2}>
+                        <strong>Total ({currency})</strong>
+                      </td>
+                      <td colSpan={3}>
+                        <strong>
+                          <span style={{ color: 'green' }}>
+                            Credit:{' '}
+                            {new Intl.NumberFormat('pt-BR', {
+                              style: 'currency',
+                              currency,
+                            }).format(total.credit)}
+                          </span>{' '}
+                          |{' '}
+                          <span style={{ color: 'red' }}>
+                            Debit:{' '}
+                            {new Intl.NumberFormat('pt-BR', {
+                              style: 'currency',
+                              currency,
+                            }).format(total.debit)}
+                          </span>
+                        </strong>
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              );
+            })}
         </tbody>
       </table>
 
       <button onClick={clearFilters} style={{ marginTop: '1rem' }}>
-        Clear filter
+        Limpar Filtros
       </button>
     </div>
   );
