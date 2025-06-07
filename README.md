@@ -19,7 +19,7 @@ Projeto de desafio técnico para estágio - App de controle financeiro.
 ✅ Botão de deletar transações com senha protegida  
 ✅ Backend seguro com variável de ambiente para senha  
 ✅ CRUD completo de transações  
-✅ Integração Frontend + Backend + Banco
+✅ Integração Frontend + Backend + Banco via Docker Compose
 
 ## 🗂️ Estrutura do projeto
 
@@ -30,10 +30,12 @@ fin-app/
 │   ├── package.json
 │   ├── tsconfig.json
 │   ├── .env
+│   ├── Dockerfile
 ├── frontend/           # Aplicação React
 │   ├── src/
 │   ├── package.json
 │   ├── tsconfig.json
+├── docker-compose.yml
 ├── .gitignore
 ├── README.md
 ```
@@ -48,12 +50,16 @@ fin-app/
 
 ### Passo a passo
 
-#### Backend
+#### Backend + Banco de Dados
 
 ```bash
-cd backend
-npm install
-npm run dev
+docker-compose up --build
+```
+
+👉 Após a primeira vez, você pode rodar apenas:
+
+```bash
+docker-compose up
 ```
 
 #### Frontend
@@ -66,9 +72,7 @@ npm run dev
 
 ### Banco de dados (Docker)
 
-```bash
-docker run --name postgres-finapp -e POSTGRES_PASSWORD=admin -p 5432:5432 -d postgres
-```
+O serviço `db` (PostgreSQL) já é iniciado automaticamente via `docker-compose`.
 
 ## ✨ Sobre a segurança
 
@@ -79,6 +83,47 @@ ADMIN_PASSWORD=admin123
 ```
 
 - Pode ser alterada a qualquer momento sem precisar mudar o código.
+
+## ✅ Testando a API
+
+### Verificar transações (GET)
+
+```http
+GET http://localhost:3333/transactions
+```
+
+### Adicionar transação (POST)
+
+```http
+POST http://localhost:3333/transactions
+```
+
+Body (JSON):
+
+```json
+{
+  "date": "2025-06-08",
+  "description": "Compra de exemplo",
+  "amount": 150,
+  "type": "debit",
+  "currency": "BRL",
+  "id": "UUID_AQUI"
+}
+```
+
+### Deletar transação (DELETE)
+
+```http
+DELETE http://localhost:3333/transactions/:id
+```
+
+Body (JSON):
+
+```json
+{
+  "password": "admin123"
+}
+```
 
 ---
 

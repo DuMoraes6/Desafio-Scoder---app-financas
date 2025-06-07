@@ -44,9 +44,9 @@ export function TransactionTable({ transactions, onDelete }: Props) {
       acc[tx.currency] = { credit: 0, debit: 0 };
     }
     if (tx.type === 'credit') {
-      acc[tx.currency].credit += tx.amount;
+      acc[tx.currency].credit += Number(tx.amount);
     } else {
-      acc[tx.currency].debit += tx.amount;
+      acc[tx.currency].debit += Number(tx.amount);
     }
     return acc;
   }, {} as Record<string, { credit: number; debit: number }>);
@@ -91,9 +91,9 @@ export function TransactionTable({ transactions, onDelete }: Props) {
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
               >
-                <option value="">Todos</option>
-                <option value="credit">Crédito</option>
-                <option value="debit">Débito</option>
+                <option value="">All</option>
+                <option value="credit">Crédit</option>
+                <option value="debit">Débit</option>
               </select>
             </th>
             <th></th>
@@ -122,7 +122,7 @@ export function TransactionTable({ transactions, onDelete }: Props) {
                 )}
               </td>
               <td>
-                <button onClick={() => onDelete(tx.id)}>Deletar</button>
+                <button onClick={() => onDelete(tx.id)}>Delete</button>
               </td>
             </tr>
           ))}
@@ -157,7 +157,7 @@ export function TransactionTable({ transactions, onDelete }: Props) {
       </table>
 
       <button onClick={clearFilters} style={{ marginTop: '1rem' }}>
-        Limpar Filtros
+        Clear filter
       </button>
     </div>
   );

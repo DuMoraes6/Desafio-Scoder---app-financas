@@ -14,7 +14,7 @@ export function TransactionForm() {
   }>({
     date: '',
     description: '',
-    amount: '',
+    amount: ' ',
     type: 'credit',
     currency: 'BRL',
   });
