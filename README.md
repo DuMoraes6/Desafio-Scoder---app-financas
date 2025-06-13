@@ -1,5 +1,7 @@
 # FinApp - Controle Financeiro Full Stack
 
+[![Docker Compose Ready](https://img.shields.io/badge/docker--compose-ready-brightgreen?style=for-the-badge&logo=docker)](https://docs.docker.com/compose/)
+
 Projeto de desafio técnico para estágio - App de controle financeiro.
 
 ## 🚀 Tecnologias utilizadas
@@ -134,5 +136,5 @@ Body (JSON):
 
 ---
 
-Desenvolvido por [Seu Nome] 🚀  
+Desenvolvido por Eduardo 🚀  
 Desafio Técnico - Estágio em Desenvolvimento Full Stack
